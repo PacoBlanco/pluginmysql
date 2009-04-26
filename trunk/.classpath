@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path=""/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Archivos de programa/hyperic-hq-installer/hyperic-hq-agent-4.1.1/bundles/agent-4.1.1-1045/pdk/lib/hyperic-util.jar"/>
+	<classpathentry kind="lib" path="C:/Archivos de programa/hyperic-hq-installer/hyperic-hq-agent-4.1.1/bundles/agent-4.1.1-1045/pdk/lib/hq-product.jar"/>
+	<classpathentry kind="lib" path="C:/Archivos de programa/hyperic-hq-installer/hyperic-hq-agent-4.1.1/bundles/agent-4.1.1-1045/pdk/lib/sigar.jar"/>
+	<classpathentry kind="lib" path="C:/Archivos de programa/hyperic-hq-installer/hyperic-hq-agent-4.1.1/bundles/agent-4.1.1-1045/pdk/lib/commons-logging.jar"/>
+	<classpathentry kind="output" path=""/>
+</classpath>
