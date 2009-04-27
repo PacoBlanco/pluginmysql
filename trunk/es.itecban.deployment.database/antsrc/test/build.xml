@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<project default="execute_plan" name="Test:DB" basedir="../..">
+	<target name="execute_plan">
+		<echo message="Running plan ${project.name}" />
+		<tstamp />
+		<ant inheritAll="false" antfile="/home/ruben/workspace/db.deploy/build.xml" dir="/home/ruben/workspace/db.deploy/">
+		
+			<property name="es.itecban.deployment.db.schema.name" value="pbo" />
+			<property name="es.itecban.deployment.unit.name" value="ddl-hb.zip"/>
+			
+			<property name="es.itecban.deployment.unit.packageURL" value="file:${basedir}/ud/ddl-hb.zip"/>
+			<property name="es.itecban.deployment.unit.version" value="1.0"/>
+				
+			<property name="es.itecban.deployment.container.url" value="jdbc:mysql://localhost:3306/itecbanPBO2" />
+			<property name="es.itecban.deployment.container.username" value="root" />
+			<property name="es.itecban.deployment.container.password" value="password" />
+			<property name="database.driver" value="com.mysql.jdbc.Driver" />
+			
+			<target name="INSTALL_DEPLOYMENT_UNIT_DDL">
+			</target>
+		</ant>
+
+	</target>
+	
+</project>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                      http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+		<bean id="dbDeploymentTranslator"
+		class="es.itecban.deployment.environment.tasks.database.Translator" />
+
+	<osgi:service ref="dbDeploymentTranslator"
+		interface="es.itecban.deployment.environment.runner.DeploymentActivityTranslator">
+		<osgi:service-properties>
+			<entry key="supportedContainer">
+				<list>
+				<value>es.itecban.deployment.container.db.mysql</value>
+        		<value>es.itecban.deployment.container.db.oracle</value>
+				</list>
+			</entry>
+			<entry key="supportedContainerVersion" value="[10.0,10.0]"/> <!-- ¿Versiones de DBs? -->
+			<entry key="supportedOperations">
+				 <list>
+        		<value>INSTALL_DEPLOYMENT_UNIT</value>
+        		<value>START_DEPLOYMENT_UNIT</value>
+        		</list>
+        	</entry>
+			
+			</osgi:service-properties>
+		</osgi:service>
+	
+</beans>

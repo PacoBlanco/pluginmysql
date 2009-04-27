@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Db Plug-in
+Bundle-SymbolicName: es.itecban.deployment.database;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: es.itecban.deployment.environment.runner.tasks.database.Activator
+Require-Bundle: org.eclipse.core.runtime
+Eclipse-LazyStart: true
+Import-Package: es.itecban.deployment.environment.runner,
+ es.itecban.deployment.environment.runner.ant,
+ es.itecban.deployment.model.deployment.plan,
+ es.itecban.deployment.model.deployment.target,
+ es.itecban.deployment.model.deployment.unit,
+ org.eclipse.emf.common.util
+Bundle-ClassPath: .,
+ lib/ant.jar,
+ lib/api.jar

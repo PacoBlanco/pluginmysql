@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This is the main ant build script of Liquibase. It requires Ant 1.7.0+.
+
+The available targets at the current stage:
+
+-->
+
+<project name="dbdeployment" basedir="." default="INSTALL_DEPLOYMENT_UNIT_DDL">
+	<description>
+   		
+    </description>
+  
+	<property name="librarydir" value="${basedir}/../lib"/>
+
+	<!-- Path definitions -->
+	
+	<path id="classpath.liquibase">
+		<fileset dir="${librarydir}/lib-liquibase">
+			<include name="liquibase-1.8.1.jar"/>
+		</fileset>
+		<fileset dir="${librarydir}/lib-hibernate">
+			<include name="commons-collections-2.1.1.jar"/>
+			<include name="commons-logging-1.0.4.jar"/>
+			<include name="dom4j-1.6.1.jar"/>
+			<include name="ejb3-persistence.jar"/>
+			<include name="freemarker-2.3.8.jar"/>
+			<include name="hibernate3-3.2.6.jar"/>
+			<include name="hibernate-annotations.jar"/>
+			<include name="hibernate-commons-annotations.jar"/>
+			<include name="hibernate-entitymanager.jar"/>
+			<include name="hibernate-tools.jar"/>
+			<include name="jtidy-r8-20060801.jar"/>
+		</fileset>
+		
+		<fileset dir="${librarydir}/lib-jdbc/mysql-5.0.4">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="${librarydir}/lib-jdbc/oracle-10.2">
+			<include name="*.jar"/>
+		</fileset>
+		 <pathelement location="${basedir}"/>
+
+	</path>
+	<path id="classpath.jpa">
+		 <pathelement location="${librarydir}/lib-hibernate"/>
+  	 	<pathelement location="${basedir}/temp/ddl/jpa"/>
+			<fileset dir="${librarydir}/lib-hibernate">
+						<include name="*.jar"/>
+			</fileset>
+	</path>
+	<path id="classpath.dbunit">
+	<fileset dir="${librarydir}/lib-dbunit">
+			<include name="dbunit-2.3.0.jar"/>
+			<include name="slf4j-api-1.4.3.jar"/>
+			<include name="slf4j-nop-1.4.3.jar"/>
+		</fileset>
+		<fileset dir="${librarydir}/lib-jdbc">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+	<path id="classpath.temp">
+		
+		 <pathelement location="${basedir}"/>
+	</path>
+	<path id="classpath.hibconf">
+		<fileset dir="${librarydir}/lib-others">
+			<include name="ant-task-hibernate-config.jar"/>
+		</fileset>
+	</path>
+	<path id="xmltask.classpath">
+		<fileset dir="${librarydir}/lib-others/">
+			<include name="xmltask-v1.15.1.jar" />
+		</fileset>
+	</path>
+
+	<!-- Task definitions -->
+	<taskdef name="dbunit" classname="org.dbunit.ant.DbUnitTask">
+		<classpath refid="classpath.dbunit"/>
+	</taskdef>
+
+	<taskdef resource="liquibasetasks.properties">
+		<classpath refid="classpath.liquibase"/>
+	</taskdef>
+
+	<taskdef name="hibconfig" classname="HibernateConfigFileTask">
+		<classpath refid="classpath.hibconf"/>
+	</taskdef>
+	<taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask">
+	<classpath refid="xmltask.classpath"/>
+	</taskdef>
+<!--
+	<property name="es.itecban.deployment.unit.packageURL" value="file:${basedir}/ud/pbo-dml_1.0.zip"/>
+	<property name="es.itecban.deployment.unit.name" value="pbo-dml_1.0.zip"/>
+	<property name="es.itecban.deployment.unit.version" value="1.0"/>
+	
+	<property name="es.itecban.deployment.db.schema.name" value="itecbanPBO"/>
+	<property name="es.itecban.deployment.container.url" value="jdbc:oracle:thin:@indra2.dit.upm.es:1521:ITECBAN" />
+
+	<property name="es.itecban.deployment.container.username" value="itecbanPBO" />
+	<property name="es.itecban.deployment.container.password" value="_itecbanPBO" />
+	<property name="database.driver" value="oracle.jdbc.driver.OracleDriver" />
+
+	<property name="filename.db" value="Oracle10g" />
+	<property name="precondition.db" value="oracle" />	
+	-->
+<target name="INSTALL_DEPLOYMENT_UNIT_DDL" description="Actualizacion del esquema de la base de datos">
+		
+	<property name="sql.type" value="ddl" />
+	<property name="drop" value="true" />	
+	 <delete dir="temp"/>
+	<mkdir dir="${basedir}/temp"/> 
+	<get src="${es.itecban.deployment.unit.packageURL}" 	dest="${basedir}/temp/${es.itecban.deployment.unit.name}" verbose="true"/>
+			<!--<copy file="${es.itecban.deployment.unit.packageURL}" todir="${basedir}/temp" /> --> 
+	<unzip src="${basedir}/temp/${es.itecban.deployment.unit.name}"  dest="${basedir}/temp"/>
+
+<available file="${basedir}/temp/ddl/sql"  type="dir" 
+	property="update.type" value="UPDATE_DATABASE_SQL"/>
+	
+	<available file="${basedir}/temp/ddl/lb" type="dir" 
+		property="update.type" value="UPDATE_DATABASE" />
+		 	
+	<available file="${basedir}/temp/ddl/jpa" type="dir" 
+		property="update.type" value="UPDATE_DATABASE" />
+	
+	<available file="${basedir}/temp/ddl/hb" type="dir" 
+		property="update.type" value="UPDATE_DATABASE" />	
+	<fail unless="update.type">	
+		La UD esta mal formada si es del tipo indicado. NOTA:ddl/[jpa|hb|lb]
+		</fail>	
+	<antcall target="${update.type}">
+	
+	</antcall>
+	
+	 <delete dir="temp"/>
+	
+</target>
+
+<target name="REVERT_DEPLOYMENT_UNIT_DDL" description="Actualizacion del esquema de la base de datos">
+		
+	<mkdir dir="${basedir}/temp"/> 
+	<get src="${es.itecban.deployment.unit.packageURL}" 	dest="${basedir}/temp/${es.itecban.deployment.unit.name}" verbose="true"/>
+			<!--<copy file="${es.itecban.deployment.unit.packageURL}" todir="${basedir}/temp" /> --> 
+	<unzip src="${basedir}/temp/${es.itecban.deployment.unit.name}"  dest="${basedir}/temp"/>
+		
+	<available file="${basedir}/temp/ddl/lb" type="dir" 
+		property="ddl.type" value="PROCESS_LB" />
+		 	
+	<available file="${basedir}/temp/ddl/jpa" type="dir" 
+		property="ddl.type" value="PROCESS_JPA" />
+	
+	<available file="${basedir}/temp/ddl/hb" type="dir" 
+		property="ddl.type" value="PROCESS_HB" />
+	
+	<fail unless="ddl.type">Solo puede desinstalar ud de los tipos: jpa,hb,lb.
+							La UD esta mal formada si es del tipo indicado. NOTA:ddl/[jpa|hb|lb]</fail>	
+	<antcall target="${ddl.type}">
+		<param name="output.file" value="${basedir}/temp/ddl/db.changelog.xml" />
+	</antcall>
+	
+	<antcall target="ROLLBACK_DATABASE_DDL">
+		<param name="changelog.xml" value="${basedir}/temp/ddl/db.changelog.xml" />
+	</antcall>
+	
+	
+	 <delete dir="temp"/>
+	
+</target>
+
+<!--
+<property name="author.name" value="ruben" />
+<property name="file.name.sql" value="mysql.sql" />
+<property name="precondition.db" value="mysql" />
+												
+<property name="es.itecban.deployment.unit.packageURL" value="file:${basedir}/ud/dml-sqldata-mysql.zip"/>
+<property name="es.itecban.deployment.unit.name" value="dml-sqldata-mysql.zip"/>
+-->	
+  
+	
+
+<!--
+<property name="es.itecban.deployment.unit.packageURL" value="file:${basedir}/ud/dml-dbunit.zip"/>
+<property name="es.itecban.deployment.unit.name" value="dml-dbunit.zip"/>
+
+<property name="database.datatype" value="org.dbunit.ext.mysql.MySqlDataTypeFactory" />
+
+<property name="es.itecban.deployment.container.url" value="jdbc:mysql://localhost:3306/pbo" />
+<property name="es.itecban.deployment.container.username" value="root" />
+<property name="es.itecban.deployment.container.password" value="password" />
+<property name="database.driver" value="com.mysql.jdbc.Driver" />
+-->
+<target name="INSTALL_DEPLOYMENT_UNIT_DML" description="Actualizacion del esquema de la base de datos">
+	
+	<property name="sql.type" value="dml" />	
+	<property name="drop" value="false" />	
+	
+	
+	<mkdir dir="${basedir}/temp"/> 
+	<get src="${es.itecban.deployment.unit.packageURL}" 	dest="${basedir}/temp/${es.itecban.deployment.unit.name}" verbose="true"/>
+			<!--<copy file="${es.itecban.deployment.unit.packageURL}" todir="${basedir}/temp" /> --> 
+	<unzip src="${basedir}/temp/${es.itecban.deployment.unit.name}"  dest="${basedir}/temp"/>
+		
+	<available file="${basedir}/temp/dml/sql" type="dir" 
+		property="dml.type" value="UPDATE_DATABASE_SQL" />
+	
+	<available file="${basedir}/temp/dml/dbunit" type="dir" 
+		property="dml.type" value="UPDATE_DATABASE_DBUNIT" />
+	
+	<fail unless="dml.type">La UD esta mal formada. NOTA:ddl/[sql|dbunit]</fail>
+	<antcall target="${dml.type}"/>
+	
+	<delete dir="temp"/>
+</target>
+
+
+<target name="REVERT_DEPLOYMENT_UNIT_DML" description="Actualizacion del esquema de la base de datos">
+		
+	<mkdir dir="${basedir}/temp"/> 
+	<get src="${es.itecban.deployment.unit.packageURL}" 	dest="${basedir}/temp/${es.itecban.deployment.unit.name}" verbose="true"/>
+			<!--<copy file="${es.itecban.deployment.unit.packageURL}" todir="${basedir}/temp" /> --> 
+	<unzip src="${basedir}/temp/${es.itecban.deployment.unit.name}"  dest="${basedir}/temp"/>
+
+	<available file="${basedir}/temp/dml/dbunit" type="dir" 
+		property="dml.type" value="ROLLBACK_DATABASE_DBUNIT" />
+	<fail unless="dml.type">Solo puede desinstalar los datos de dbunit.
+							La UD esta mal formada si es de dbunit. NOTA:dml/dbunit/dbunit.xml</fail>
+
+	<dbunit
+         driver="${database.driver}"
+         url="${es.itecban.deployment.container.url}"
+         userid="${es.itecban.deployment.container.username}"
+         password="${es.itecban.deployment.container.password}"
+         datatypeFactory="${database.datatype}">
+	<!-- classpath al driver (OPCIONAL) posible uso para distintas versiones de drivers-->
+	<!--
+	<classpath>
+		<pathelement location="lib/mysql-connector-java-5.0.4-bin.jar"/>
+	</classpath>
+	-->
+	<operation type="DELETE" format="flat" 
+	transaction="true" src="${basedir}/temp/dml/dbunit/dbunit.xml"/>
+	</dbunit>
+
+	
+	<delete dir="temp"/>
+</target>
+
+
+
+<target name="UPDATE_DATABASE_DBUNIT" description="Inserccion de datos dbunit">
+	
+	<dbunit
+         driver="${database.driver}"
+         url="${es.itecban.deployment.container.url}"
+         userid="${es.itecban.deployment.container.username}"
+         password="${es.itecban.deployment.container.password}"
+         datatypeFactory="${database.datatype}">
+	<!-- classpath al driver (OPCIONAL) posible uso para distintas versiones de drivers-->
+	<!--
+	<classpath>
+		<pathelement location="lib/mysql-connector-java-5.0.4-bin.jar"/>
+	</classpath>
+	-->
+	<operation type="INSERT" format="flat" 
+	transaction="true" src="${basedir}/temp/dml/dbunit/dbunit.xml"/>
+	</dbunit>
+		
+						
+</target>
+
+<!--	
+
+<property name="sql.type" value="dml" />
+
+		    
+			
+<property name="author.name" value="ruben" />
+<property name="file.name.sql" value="mysql.sql" />
+<property name="precondition.db" value="mysql" />
+<property name="id.change"
+-->
+
+<target name="UPDATE_DATABASE_SQL" description="ejecuta a traves de liquibase un script sql">
+	
+
+	<updateDatabase changeLogFile="${basedir}/resources/sql.changelog.xml" 
+			driver="${database.driver}" 
+			url="${es.itecban.deployment.container.url}" 
+			username="${es.itecban.deployment.container.username}" 
+			password="${es.itecban.deployment.container.password}" 
+			dropFirst="${drop}"
+			defaultSchemaName= "${es.itecban.deployment.db.schema.name}"
+		
+			 classpathref="classpath.liquibase">
+
+				<changeLogProperty name="author.name" value="${es.itecban.deployment.unit.name}" />
+				<changeLogProperty name="id.change" value="${es.itecban.deployment.unit.version}-" />
+				<changeLogProperty name="dbms.type" value="${precondition.db}" />
+				<changeLogProperty name="sql.type" value="${sql.type}" />
+				<changeLogProperty name="sql.name" value="${filename.db}.sql" />
+	</updateDatabase>
+		
+</target>
+
+<target name="UPDATE_DATABASE" description="Vuelta atras en el esquema con el tag dado">
+			
+		
+	<available file="${basedir}/temp/ddl/lb" type="dir" 
+		property="ddl.type" value="PROCESS_LB" />
+		 	
+	<available file="${basedir}/temp/ddl/jpa" type="dir" 
+		property="ddl.type" value="PROCESS_JPA" />
+	
+	<available file="${basedir}/temp/ddl/hb" type="dir" 
+		property="ddl.type" value="PROCESS_HB" />
+		
+		
+		<antcall target="${ddl.type}">
+			<param name="output.file" value="${basedir}/temp/ddl/db.changelog.xml" />
+		</antcall>
+		
+		<property name="changelog.xml" value="${basedir}/temp/ddl/db.changelog.xml" />
+
+
+<updateDatabase
+         changeLogFile="${changelog.xml}"
+         driver="${database.driver}"
+         url="${es.itecban.deployment.container.url}"
+         username="${es.itecban.deployment.container.username}"
+         password="${es.itecban.deployment.container.password}" 
+		 
+         dropFirst="true"
+         classpathref="classpath.liquibase"/>
+		 
+	<delete dir="temp"/>	 
+	
+</target>
+<target name="ROLLBACK_DATABASE_DDL" description="Vuelta atras en el esquema con el tag dado">
+	
+	<rollbackDatabase
+         changeLogFile="${changelog.xml}"
+         driver="${database.driver}"
+         url="${es.itecban.deployment.container.url}"
+         username="${es.itecban.deployment.container.username}"
+         password="${es.itecban.deployment.container.password}"
+         classpathref="classpath.liquibase"
+         rollbackCount="1">
+	</rollbackDatabase>
+	
+</target>
+
+
+
+
+<target name="PROCESS_LB" description="">
+		<antcall target="xmltask">
+		 		<param name="id.change" value="${es.itecban.deployment.unit.name}" />
+		 		<param name="source.xml" value="${basedir}/temp/ddl/lb/db.changelog.xml" />
+		 		<param name="dest.xml" value="${output.file}" />
+	</antcall>
+		
+</target>
+
+<target name="PROCESS_HB">
+			
+	<hibconfig dest="${basedir}/temp/hibernate.cfg.xml">
+		<sfproperty name="connection.datasource" value="java:/data"/>
+		<sfproperty name="dialect" value="org.hibernate.dialect.OracleDialect"/>
+		<sfproperty name="cache.provider_class" value="org.hibernate.cache.HashtableCacheProvider"/>
+		<sfproperty name="show_sql" value="false"/>
+		<mapping dir="${basedir}">
+			<include name="**/**/*.hbm.xml"/>
+			<!--<exclude name="**/Testtable.hbm"/> -->
+		</mapping>
+	</hibconfig>
+		<generateChangeLog        	
+         	 url="hibernate:temp/hibernate.cfg.xml"
+           	classpathref="classpath.temp"
+         	outputFile="${basedir}/temp/generate.changelog.xml">
+		</generateChangeLog>
+
+		<antcall target="xmltask">
+		 		<param name="id.change" value="${es.itecban.deployment.unit.name}" />
+		 		<param name="source.xml" value="${basedir}/temp/generate.changelog.xml" />
+		 		<param name="dest.xml" value="${output.file}" />
+	</antcall>
+
+</target>
+
+<target name="PROCESS_JPA">
+	
+	<taskdef name="hibernatetool"
+	     classname="org.hibernate.tool.ant.HibernateToolTask"
+		 classpathref="classpath.jpa"/>
+	<hibernatetool  destdir="${basedir}/temp/ddl/jpa">
+	 
+	 <!-- it is in this classpath you put your classes dir,
+	  and/or jpa persistence compliant jar 
+	<classpath>
+		   <path location="${basedir}/ddl/jpa" />
+		   	 <pathelement location="${librarydir}/lib-liquibase/tools"/>
+  	 <pathelement location="${basedir}/ddl/jpa"/>
+	</classpath>
+-->
+	 <!-- persistence unit se puede omitir si solo existe un persistence.xml -->
+	<jpaconfiguration persistenceUnit="TramitacionEM"/>
+	<!-- list exporters here -->
+	<hbm2hbmxml/>
+	</hibernatetool>
+	<hibconfig dest="${basedir}/temp/ddl/jpa/hibernate.cfg.xml">
+		<sfproperty name="connection.datasource" value="java:/data"/>
+		<sfproperty name="dialect" value="org.hibernate.dialect.MySQLDialect"/>
+		<sfproperty name="cache.provider_class" value="org.hibernate.cache.HashtableCacheProvider"/>
+		<sfproperty name="show_sql" value="false"/>
+		<mapping dir="${basedir}">
+			<include name="**/**/*.hbm.xml"/>
+			<!--<exclude name="**/Testtable.hbm"/> -->
+		</mapping>
+	</hibconfig>
+		<generateChangeLog        	
+         	 url="hibernate:temp/ddl/jpa/hibernate.cfg.xml"
+           	classpathref="classpath.liquibase"
+         	outputFile="${basedir}/temp/ddl/jpa/db.changelog.xml">
+		</generateChangeLog>
+		
+	<antcall target="xmltask">
+		 		<param name="id.change" value="${es.itecban.deployment.unit.name}" />
+		 		<param name="source.xml" value="${basedir}/temp/ddl/jpa/db.changelog.xml" />
+		 		<param name="dest.xml" value="${output.file}" />
+	</antcall>
+	
+</target>
+
+
+
+
+	<target name="xmltask" description="Modifica un changelog para dejarlo en un cambio unico">
+	 
+	 <xmltask source="${source.xml}" dest="${dest.xml}"   preserveType="true">
+	 
+		<cut path="/:databaseChangeLog/:changeSet/:*" buffer="buffer" append="true"/>
+		
+		</xmltask>
+		
+	 <xmltask source="resources/templatelb.xml" dest="${dest.xml}" > 
+	  <paste path="/:databaseChangeLog/:changeSet[1]" buffer="buffer"/>
+	  <attr path="/:databaseChangeLog/:changeSet[1]" attr="id" value="${es.itecban.deployment.unit.version}"/>
+	  <attr path="/:databaseChangeLog/:changeSet[1]" attr="author" value="${es.itecban.deployment.unit.name}"/>
+	  <insert path="/:databaseChangeLog/:changeSet[1]/:comment[1]"
+	   xml="${es.itecban.deployment.unit.packageURL}"/>
+	</xmltask> 
+		</target>
+
+	
+<target name="START_DEPLOYMENT_UNIT_DDL" description="">	
+	
+</target>
+
+
+<target name="START_DEPLOYMENT_UNIT_DML" description="">	
+	
+</target>
+	
+
+</project>
