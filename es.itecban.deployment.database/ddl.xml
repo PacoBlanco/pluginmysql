@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ASCII"?>
+<unit:deploymentUnit
+    xmlns:unit="http://model.deployment.itecban.es/DeploymentUnit">
+  <name>PBO-DDL</name>
+  <version>1.0</version>
+  <description>DDL para el PBO</description>
+  <provider>
+    <name>es.itecban.deployment</name>
+    <id>1</id>
+    <homeUrl>http://www.indra.es</homeUrl>
+  </provider>
+  <package>
+    <name>pbo-ddl_1.0.zip</name>
+    <version></version>
+    <type>es.itecban.deployment.packaging.zip.ddl</type>
+  </package>
+  <exportedResources>
+    <exportedResource>
+      <name>PBO-DDL</name>
+      <version>1.0</version>
+      <types>
+        <type>es.itecban.deployment.db.ddl</type>
+      </types>
+      <resourceProperties>
+        <resourceProperty>
+          <name>es.itecban.deployment.db.name</name>
+          <value>ITECBAN</value>
+        </resourceProperty>
+      </resourceProperties>
+    </exportedResource>
+  </exportedResources>
+  <constraints>
+    <constraint>
+      <name>es.itecban.deployment.container.db</name>
+      <version></version>
+      <type>es.itecban.deployment.container</type>
+      <requiredResourceProperties/>
+    </constraint>
+  </constraints>
+  <unitRepositories/>
+</unit:deploymentUnit>

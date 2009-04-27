@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<unit:deploymentUnit xmlns:unit="http://model.deployment.itecban.es/DeploymentUnit">
+  <name>PBO-DML</name>
+  <version>1.0</version>
+  <description>DML para el PBO</description>
+  <provider>
+    <name>es.itecban.deployment</name>
+    <id>1</id>
+    <homeUrl>http://www.indra.es</homeUrl>
+  </provider>
+  <package>
+    <name>pbo-dml_1.0.zip</name>
+    <version/>
+    <type>es.itecban.deployment.packaging.zip.dml</type>
+  </package>
+  <exportedResources>
+    <exportedResource>
+      <name>PBO-DML</name>
+      <version>1.0</version>
+      <types>
+        <type>es.itecban.deployment.db.dml</type>
+      </types>
+      <resourceProperties>
+        <resourceProperty>
+          <name>es.itecban.deployment.db.name</name>
+          <value>itecbanPBO</value>
+        </resourceProperty>
+      </resourceProperties>
+    </exportedResource>
+  </exportedResources>
+  <dependencies>
+    <dependencyExpression/>
+    <dependency>
+      <id>PBO-DDL</id>
+      <locality>ANYNODE</locality>
+      <description>Base de datos con la informacion necesaria</description>
+      <requiredResource>
+        <name>PBO-DDL</name>
+        <version>1.0</version>
+        <type>es.itecban.deployment.db.ddl</type>
+        <requiredResourceProperties/>
+      </requiredResource>
+    </dependency>
+  </dependencies>
+  <constraints>
+    <constraint>
+      <name>es.itecban.deployment.container.db</name>
+      <version/>
+      <type>es.itecban.deployment.container</type>
+      <requiredResourceProperties/>
+    </constraint>
+  </constraints>
+  <unitRepositories/>
+</unit:deploymentUnit>
