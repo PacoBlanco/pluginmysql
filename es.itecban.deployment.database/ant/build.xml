@@ -11,7 +11,7 @@ The available targets at the current stage:
    		
     </description>
   
-	<property name="librarydir" value="${basedir}/../lib"/>
+	<property name="librarydir" value="${basedir}/lib"/>
 
 	<!-- Path definitions -->
 	
@@ -71,6 +71,7 @@ The available targets at the current stage:
 	<path id="xmltask.classpath">
 		<fileset dir="${librarydir}/lib-others/">
 			<include name="xmltask-v1.15.1.jar" />
+			<include name="xalan.jar" />
 		</fileset>
 	</path>
 
@@ -87,7 +88,7 @@ The available targets at the current stage:
 		<classpath refid="classpath.hibconf"/>
 	</taskdef>
 	<taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask">
-	<classpath refid="xmltask.classpath"/>
+		<classpath refid="xmltask.classpath"/>
 	</taskdef>
 <!--
 	<property name="es.itecban.deployment.unit.packageURL" value="file:${basedir}/ud/pbo-dml_1.0.zip"/>
@@ -107,15 +108,18 @@ The available targets at the current stage:
 <target name="INSTALL_DEPLOYMENT_UNIT_DDL" description="Actualizacion del esquema de la base de datos">
 		
 	<property name="sql.type" value="ddl" />
-	<property name="drop" value="true" />	
-	 <delete dir="temp"/>
+	<property name="drop" value="${install.ddl.drop}" />	
+	<delete dir="temp"/>
 	<mkdir dir="${basedir}/temp"/> 
 	<get src="${es.itecban.deployment.unit.packageURL}" 	dest="${basedir}/temp/${es.itecban.deployment.unit.name}" verbose="true"/>
 			<!--<copy file="${es.itecban.deployment.unit.packageURL}" todir="${basedir}/temp" /> --> 
 	<unzip src="${basedir}/temp/${es.itecban.deployment.unit.name}"  dest="${basedir}/temp"/>
+	
+	<available property="database.driver" value="com.mysql.jdbc.Driver" value="org.hibernate.dialect.MySQLDialect
+		
 
-<available file="${basedir}/temp/ddl/sql"  type="dir" 
-	property="update.type" value="UPDATE_DATABASE_SQL"/>
+	<available file="${basedir}/temp/ddl/sql"  type="dir" 
+		property="update.type" value="UPDATE_DATABASE_SQL"/>
 	
 	<available file="${basedir}/temp/ddl/lb" type="dir" 
 		property="update.type" value="UPDATE_DATABASE" />
@@ -322,14 +326,14 @@ The available targets at the current stage:
 		<property name="changelog.xml" value="${basedir}/temp/ddl/db.changelog.xml" />
 
 
-<updateDatabase
+	<updateDatabase
          changeLogFile="${changelog.xml}"
          driver="${database.driver}"
          url="${es.itecban.deployment.container.url}"
          username="${es.itecban.deployment.container.username}"
          password="${es.itecban.deployment.container.password}" 
 		 
-         dropFirst="true"
+         dropFirst="${install.ddl.drop}"
          classpathref="classpath.liquibase"/>
 		 
 	<delete dir="temp"/>	 
@@ -362,10 +366,10 @@ The available targets at the current stage:
 </target>
 
 <target name="PROCESS_HB">
-			
-	<hibconfig dest="${basedir}/temp/hibernate.cfg.xml">
+	<hibconfig dest="${basedir}/temp/hibernate.cfg.xml">		
 		<sfproperty name="connection.datasource" value="java:/data"/>
-		<sfproperty name="dialect" value="org.hibernate.dialect.OracleDialect"/>
+		<!--<sfproperty name="dialect" value="org.hibernate.dialect.OracleDialect"/>-->
+		<sfproperty name="dialect" value="org.hibernate.dialect.MySQLDialect"/>
 		<sfproperty name="cache.provider_class" value="org.hibernate.cache.HashtableCacheProvider"/>
 		<sfproperty name="show_sql" value="false"/>
 		<mapping dir="${basedir}">
