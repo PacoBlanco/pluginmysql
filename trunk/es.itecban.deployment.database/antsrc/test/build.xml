@@ -3,7 +3,7 @@
 	<target name="execute_plan">
 		<echo message="Running plan ${project.name}" />
 		<tstamp />
-		<ant inheritAll="false" antfile="/home/ruben/workspace/db.deploy/build.xml" dir="/home/ruben/workspace/db.deploy/">
+		<ant inheritAll="false" antfile="ant/build.xml" dir="${basedir}">
 		
 			<property name="es.itecban.deployment.db.schema.name" value="pbo" />
 			<property name="es.itecban.deployment.unit.name" value="ddl-hb.zip"/>
@@ -13,8 +13,10 @@
 				
 			<property name="es.itecban.deployment.container.url" value="jdbc:mysql://localhost:3306/itecbanPBO2" />
 			<property name="es.itecban.deployment.container.username" value="root" />
-			<property name="es.itecban.deployment.container.password" value="password" />
+			<property name="es.itecban.deployment.container.password" value="bobafett1" />
 			<property name="database.driver" value="com.mysql.jdbc.Driver" />
+			
+			<property name="install.ddl.drop" value="false" />
 			
 			<target name="INSTALL_DEPLOYMENT_UNIT_DDL">
 			</target>
