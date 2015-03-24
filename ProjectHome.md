@@ -1,0 +1,1 @@
+MySql auto-discover plugin of database and tables
